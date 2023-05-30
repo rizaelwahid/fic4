@@ -33,13 +33,17 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Home - Profile'),
         actions: [
           IconButton(
-              onPressed: () async {
-                await AuthLocalStorage().removeToken();
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
+            onPressed: () async {
+              await AuthLocalStorage().removeToken();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
                   return const LoginPage();
-                }));
-              },
-              icon: const Icon(Icons.logout_outlined))
+                }),
+              );
+            },
+            icon: const Icon(Icons.logout_outlined),
+          ),
         ],
       ),
       body: Column(
@@ -76,10 +80,45 @@ class _HomePageState extends State<HomePage> {
                 return ListView.builder(itemBuilder: ((context, index) {
                   final product = state.listProduct.reversed.toList()[index];
                   return Card(
-                    child: ListTile(
-                      leading: CircleAvatar(child: Text('${product.price}')),
-                      title: Text(product.title ?? '-'),
-                      subtitle: Text(product.description ?? '-'),
+                    child: Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          ListTile(
+                            leading:
+                                CircleAvatar(child: Text('${product.price}')),
+                            title: Text(
+                              product.title ?? '-',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text(
+                              product.description ?? '-',
+                              style: const TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                          ),
+                          const Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                'Edit',
+                                style:
+                                    TextStyle(fontSize: 16, color: Colors.blue),
+                              ),
+                              SizedBox(width: 10),
+                              Text(
+                                'Delete',
+                                style:
+                                    TextStyle(fontSize: 16, color: Colors.red),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   );
                 }));

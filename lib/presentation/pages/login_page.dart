@@ -26,7 +26,7 @@ class _LoginPageState extends State<LoginPage> {
     passwordController = TextEditingController();
 
     isLogin();
-    Future.delayed(Duration(seconds: 2));
+    Future.delayed(const Duration(seconds: 2));
     super.initState();
   }
 

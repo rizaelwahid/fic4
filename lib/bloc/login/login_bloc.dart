@@ -11,18 +11,23 @@ part 'login_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
   final AuthDatasource authDatasource;
-  LoginBloc(
-    this.authDatasource,
-  ) : super(LoginInitial()) {
-    on<DoLoginEvent>((event, emit) async {
-      try {
+
+  LoginBloc(this.authDatasource) : super(LoginInitial()) {
+    on<DoLoginEvent>(
+      (event, emit) async {
         emit(LoginLoading());
+
         final result = await authDatasource.login(event.loginModel);
-        await AuthLocalStorage().saveToken(result.accessToken);
-        emit(LoginLoaded(loginResponseModel: result));
-      } catch (e) {
-        emit(LoginError(message: 'Network problem'));
-      }
-    });
+        result.fold(
+          (error) {
+            emit(LoginError(message: error));
+          },
+          (data) async {
+            await AuthLocalStorage().saveToken(data.accessToken);
+            emit(LoginLoaded(loginResponseModel: data));
+          },
+        );
+      },
+    );
   }
 }
