@@ -35,28 +35,45 @@ class AuthDatasource {
         Uri.parse('https://api.escuelajs.co/api/v1/auth/login'),
         body: loginModel.toMap(),
       );
+      // final result = LoginResponseModel.fromJson(response.body);
+      // return Right(result);
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         final result = LoginResponseModel.fromJson(response.body);
-        print(result);
         return Right(result);
       } else {
         return Left('Request failed with status: ${response.statusCode}');
       }
     } catch (e) {
-      return Left('An error occurred: $e');
+      return Left(e.toString());
     }
   }
 
-  Future<ProfileResponseModel> getProfile() async {
-    final token = await AuthLocalStorage().getToken();
-    var headers = {'Authorization': 'Bearer $token'};
-    final response = await http.get(
-      Uri.parse('https://api.escuelajs.co/api/v1/auth/profile'),
-      headers: headers,
-    );
+  // Future<ProfileResponseModel> getProfile() async {
+  //   final token = await AuthLocalStorage().getToken();
+  //   var headers = {'Authorization': 'Bearer $token'};
+  //   final response = await http.get(
+  //     Uri.parse('https://api.escuelajs.co/api/v1/auth/profile'),
+  //     headers: headers,
+  //   );
 
-    final result = ProfileResponseModel.fromJson(response.body);
-    return result;
+  //   final result = ProfileResponseModel.fromJson(response.body);
+  //   return result;
+  // }
+
+  Future<Either<String, ProfileResponseModel>> getProfile() async {
+    try {
+      final token = await AuthLocalStorage().getToken();
+      var headers = {'Authorization': 'Bearer $token'};
+      final response = await http.get(
+        Uri.parse('https://api.escuelajs.co/api/v1/auth/profile'),
+        headers: headers,
+      );
+
+      final result = ProfileResponseModel.fromJson(response.body);
+      return Right(result);
+    } catch (e) {
+      return Left(e.toString());
+    }
   }
 }

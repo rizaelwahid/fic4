@@ -19,11 +19,25 @@ class _HomePageState extends State<HomePage> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController priceController = TextEditingController();
+
   @override
   void initState() {
+    titleController = TextEditingController();
+    descriptionController = TextEditingController();
+    priceController = TextEditingController();
+
     context.read<ProfileBloc>().add(GetProfileEvent());
     context.read<GetAllProductBloc>().add(DoGetAllProductEvent());
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+
+    titleController.dispose();
+    descriptionController.dispose();
+    priceController.dispose();
   }
 
   @override
@@ -34,13 +48,13 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             onPressed: () async {
-              await AuthLocalStorage().removeToken();
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) {
                   return const LoginPage();
                 }),
               );
+              await AuthLocalStorage().removeToken();
             },
             icon: const Icon(Icons.logout_outlined),
           ),
@@ -101,16 +115,126 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                          const Row(
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
-                              Text(
-                                'Edit',
-                                style:
-                                    TextStyle(fontSize: 16, color: Colors.blue),
+                              // Text('${product.id}'),
+                              InkWell(
+                                onTap: () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: const Text('Edit Product'),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        labelText: 'Title'),
+                                                controller: titleController,
+                                              ),
+                                              TextField(
+                                                decoration:
+                                                    const InputDecoration(
+                                                        labelText: 'Price'),
+                                                controller: priceController,
+                                                keyboardType:
+                                                    TextInputType.number,
+                                              ),
+                                              TextField(
+                                                maxLines: 3,
+                                                decoration:
+                                                    const InputDecoration(
+                                                        labelText:
+                                                            'Description'),
+                                                controller:
+                                                    descriptionController,
+                                              ),
+                                            ],
+                                          ),
+                                          actions: [
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('Cancel'),
+                                            ),
+                                            const SizedBox(
+                                              width: 4,
+                                            ),
+                                            BlocListener<CreateProductBloc,
+                                                CreateProductState>(
+                                              listener: (context, state) {
+                                                if (state
+                                                    is CreateProductLoaded) {
+                                                  titleController.clear();
+                                                  priceController.clear();
+                                                  descriptionController.clear();
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                          content: Text(
+                                                              '${state.productResponseModel.id}')));
+                                                  Navigator.pop(context);
+                                                  context
+                                                      .read<GetAllProductBloc>()
+                                                      .add(
+                                                          DoGetAllProductEvent());
+                                                }
+                                              },
+                                              child: BlocBuilder<
+                                                  CreateProductBloc,
+                                                  CreateProductState>(
+                                                builder: (context, state) {
+                                                  if (state
+                                                      is CreateProductLoading) {
+                                                    return const Center(
+                                                      child:
+                                                          CircularProgressIndicator(),
+                                                    );
+                                                  }
+                                                  return ElevatedButton(
+                                                    onPressed: () {
+                                                      final productModel =
+                                                          ProductModel(
+                                                        title: titleController
+                                                            .text,
+                                                        price: int.parse(
+                                                            priceController
+                                                                .text),
+                                                        description:
+                                                            descriptionController
+                                                                .text,
+                                                      );
+                                                      context
+                                                          .read<
+                                                              CreateProductBloc>()
+                                                          .add(DoCreateProductEvent(
+                                                              productModel:
+                                                                  productModel));
+
+                                                      // context
+                                                      //     .read<GetAllProductBloc>()
+                                                      //     .add(DoGetAllProductEvent());
+                                                    },
+                                                    child: const Text('Save'),
+                                                  );
+                                                },
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      });
+                                },
+                                child: const Text(
+                                  'Edit',
+                                  style: TextStyle(
+                                      fontSize: 16, color: Colors.blue),
+                                ),
                               ),
-                              SizedBox(width: 10),
-                              Text(
+                              const SizedBox(width: 10),
+                              const Text(
                                 'Delete',
                                 style:
                                     TextStyle(fontSize: 16, color: Colors.red),

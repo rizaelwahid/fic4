@@ -86,6 +86,14 @@ class _LoginPageState extends State<LoginPage> {
                     return const HomePage();
                   }));
                 }
+
+                if (state is LoginError) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        backgroundColor: Colors.red,
+                        content: Text('Login Failed: ${state.message}')),
+                  );
+                }
               },
               builder: (context, state) {
                 if (state is RegisterLoading) {

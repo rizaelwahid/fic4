@@ -7,16 +7,16 @@ import 'package:http/http.dart' as http;
 class ProductDatasources {
   Future<ProductResponseModel> createProduct(ProductModel model) async {
     // try {
-    final newMap = model.toMap();
-    var headers = {'Content-Type': 'application/json'};
-    print(model.toJson());
+    // final newMap = model.toMap();
+    // var headers = {'Content-Type': 'application/json'};
+    // print(model.toJson());
     final response = await http.post(
       Uri.parse('https://api.escuelajs.co/api/v1/products'),
-      headers: headers,
+      headers: {'Content-Type': 'application/json'},
       body: model.toJson(),
     );
-    print('=====');
-    print(response.body);
+    // print('=====');
+    // print(response.body);
     return ProductResponseModel.fromJson(response.body);
     // } catch (e) {
 

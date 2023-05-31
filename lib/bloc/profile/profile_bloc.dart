@@ -13,13 +13,19 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     this.authDatasource,
   ) : super(ProfileInitial()) {
     on<GetProfileEvent>((event, emit) async {
-      try {
-        emit(ProfileLoading());
-        final result = await authDatasource.getProfile();
-        emit(ProfileLoaded(profile: result));
-      } catch (e) {
-        emit(ProfileError(message: 'network problem: ${e.toString()}'));
-      }
+      // try {
+      //   emit(ProfileLoading());
+      //   final result = await authDatasource.getProfile();
+      //   emit(ProfileLoaded(profile: result));
+      // } catch (e) {
+      //   emit(ProfileError(message: 'network problem: ${e.toString()}'));
+      // }
+      emit(ProfileLoading());
+      final result = await authDatasource.getProfile();
+      result.fold(
+        (l) => emit(ProfileError(message: l)),
+        (r) => emit(ProfileLoaded(profile: r)),
+      );
     });
   }
 }
